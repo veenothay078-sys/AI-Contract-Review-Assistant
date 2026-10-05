@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-textPrimary antialiased font-sans selection:bg-accent/20 selection:text-accent;
+  }
+}
+
+/* Solid Panel utility (replaces glass) */
+.glass-panel {
+  background: #172033; /* match card color */
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.glass-panel-dark {
+  background: #0B1220; /* match background color */
+  border: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Pulse animation for analysis skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #172033 25%, #1E293B 50%, #172033 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
