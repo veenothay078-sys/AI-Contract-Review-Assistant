@@ -19,8 +19,13 @@ export default function TopHeader({ view, currentView, setView, onNavigate, curr
     if (activeView === 'upload') return 'Workspace / New Contract Upload';
     if (activeView === 'comparison') return 'Workspace / Contract Comparison';
     if (activeView === 'report') return `Workspace / ${currentContract?.title || 'Contract'} / Executive Report`;
-    if (activeView === 'analysis' && currentContract) return `Workspace / ${currentContract.title} / Version ${currentContract.versionNumber || '1'}`;
-    return 'Workspace';
+    if (activeView === 'analysis') {
+      return currentContract 
+        ? `Workspace / ${currentContract.title || currentContract.documentType || 'Contract'} / Analysis` 
+        : 'Workspace / Contract Review';
+    }
+    if (activeView === 'profile') return 'Workspace / Profile';
+    return 'Workspace / Dashboard';
   };
 
   const parts = getBreadcrumbs().split(' / ');
@@ -32,9 +37,17 @@ export default function TopHeader({ view, currentView, setView, onNavigate, curr
       <div className="flex items-center text-sm">
         {parts.map((part, idx) => (
           <React.Fragment key={idx}>
-            <span className={`${idx === parts.length - 1 ? 'text-textPrimary font-semibold' : 'text-textMuted font-medium'}`}>
+            <button
+              type="button"
+              onClick={() => {
+                if (idx === 0 || part === 'Dashboard') {
+                  navigate('dashboard');
+                }
+              }}
+              className={`${idx === parts.length - 1 ? 'text-textPrimary font-semibold cursor-default' : 'text-textMuted hover:text-textPrimary font-medium transition-colors cursor-pointer'}`}
+            >
               {part}
-            </span>
+            </button>
             {idx < parts.length - 1 && (
               <ChevronRight className="w-4 h-4 text-textMuted mx-2" />
             )}

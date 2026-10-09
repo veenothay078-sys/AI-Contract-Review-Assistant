@@ -100,6 +100,59 @@ export default function App() {
     }
   }, [user, token]);
 
+  const handleLoadDemo = () => {
+    const demoData = generateClientAnalysis("Mutual_NDA_Standard_v4.pdf", "142 KB");
+    demoData.title = "Standard Mutual NDA Agreement (Sample Demo)";
+    demoData.contractType = "NON-DISCLOSURE AGREEMENT (NDA)";
+    demoData.documentType = "NON-DISCLOSURE AGREEMENT (NDA)";
+    demoData.confidence = 96;
+    demoData.partiesInvolved = "Aether AI Inc. & Zenith Enterprises LLC";
+    demoData.governingLaw = "Delaware Corporate Law";
+    demoData.jurisdiction = "State of Delaware, United States";
+    demoData.effectiveDate = "August 1, 2026";
+    demoData.expirationDate = "August 1, 2029 (3 Year Term)";
+    demoData.renewal = "Automatic annual renewals unless terminated with 30 days notice.";
+    demoData.paymentTerms = "N/A (Standard Reciprocal NDA Terms)";
+    demoData.terminationClause = "30 days prior written notice by either party. Survival period for confidentiality obligation is 5 years post-termination.";
+    demoData.contractHealth = "Healthy";
+    demoData.riskScore = 88;
+    demoData.riskLevel = "Low";
+    
+    setCurrentContract(demoData);
+    setAnalysisError(null);
+    setIsAnalyzing(false);
+    setView('analysis');
+    showToast("Loaded sample Mutual NDA demo review!", "success");
+
+    setTimeout(() => {
+      const el = document.getElementById('analysis-container') || document.getElementById('dashboard-view');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
+  };
+
+  useEffect(() => {
+    const handleHashCheck = () => {
+      const hash = window.location.hash;
+      if (hash === '#dashboard-view' || hash === '#demo') {
+        if (!currentContract) {
+          handleLoadDemo();
+        } else {
+          setView('analysis');
+          setTimeout(() => {
+            const el = document.getElementById('dashboard-view') || document.getElementById('analysis-container');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 150);
+        }
+      }
+    };
+
+    handleHashCheck();
+    window.addEventListener('hashchange', handleHashCheck);
+    return () => window.removeEventListener('hashchange', handleHashCheck);
+  }, [currentContract]);
+
   const startPipelineAnimation = () => {
     let stage = 0;
     const interval = setInterval(() => {
@@ -268,6 +321,7 @@ export default function App() {
                 <Hero 
                   onScrollToUpload={handleScrollToUpload}
                   onGetStarted={handleScrollToUpload} 
+                  onLoadDemo={handleLoadDemo}
                   totalContracts={contracts.length}
                 />
                 
@@ -276,6 +330,7 @@ export default function App() {
                     onAnalysisComplete={handleAnalysisStart}
                     onAnalysisStart={handleAnalysisStart} 
                     onShowNotification={showToast}
+                    onLoadDemo={handleLoadDemo}
                     isAnalyzing={isAnalyzing} 
                     existingContractId={existingContractForUpload.id}
                     existingContractTitle={existingContractForUpload.title}
@@ -311,6 +366,7 @@ export default function App() {
                     onAnalysisComplete={handleAnalysisStart}
                     onAnalysisStart={handleAnalysisStart} 
                     onShowNotification={showToast}
+                    onLoadDemo={handleLoadDemo}
                     isAnalyzing={isAnalyzing}
                     existingContractId={existingContractForUpload.id}
                     existingContractTitle={existingContractForUpload.title}
@@ -464,22 +520,43 @@ export default function App() {
 
                   {/* Empty State */}
                   {!currentContract && !isAnalyzing && !analysisError && (
-                    <motion.div key="empty-state" className="max-w-2xl mx-auto px-4 py-24 text-center">
-                      <div className="border border-border bg-card rounded-xl p-12 shadow-sm flex flex-col items-center justify-center">
-                        <div className="bg-elevated p-4 rounded-full text-textMuted mb-6">
-                          <ShieldCheck className="w-10 h-10 text-border" />
+                    <motion.div key="empty-state" className="max-w-2xl mx-auto px-4 py-20 text-center">
+                      <div className="border border-border bg-card rounded-2xl p-10 md:p-12 shadow-premium flex flex-col items-center justify-center">
+                        <div className="bg-accent/10 p-5 rounded-full text-accent mb-6 border border-accent/20">
+                          <ShieldCheck className="w-12 h-12 text-accent" />
                         </div>
-                        <h3 className="text-xl font-semibold text-textPrimary">No active review</h3>
-                        <p className="text-sm text-textMuted max-w-sm mt-3 leading-relaxed">
-                          Select a contract from your dashboard or upload a new one to begin deep legal analysis.
+                        <h3 className="text-2xl font-bold text-textPrimary">No Active Contract Review</h3>
+                        <p className="text-sm text-textMuted max-w-md mt-3 leading-relaxed">
+                          Select a contract from your dashboard, upload a new PDF document, or explore our interactive sample demo analysis instantly.
                         </p>
-                        <button
-                          onClick={() => setView('upload')}
-                          className="mt-8 px-6 py-2.5 bg-accent hover:bg-accentSecondary text-secondaryBg font-semibold rounded-lg text-sm transition-all flex items-center gap-2"
-                        >
-                          <span>Upload Contract</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
+                        
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 w-full">
+                          <button
+                            type="button"
+                            onClick={handleLoadDemo}
+                            className="px-6 py-3 bg-accent hover:bg-accentSecondary text-secondaryBg font-semibold rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Explore Demo Contract</span>
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={() => navigateTo('upload')}
+                            className="px-6 py-3 bg-elevated hover:bg-card border border-border text-textPrimary font-semibold rounded-xl text-sm transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                          >
+                            <span>Upload Contract</span>
+                            <ArrowRight className="w-4 h-4 text-textMuted" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => navigateTo('dashboard')}
+                            className="px-5 py-3 text-textMuted hover:text-textPrimary font-medium rounded-xl text-sm transition-all cursor-pointer"
+                          >
+                            Back to Workspace
+                          </button>
+                        </div>
                       </div>
                     </motion.div>
                   )}

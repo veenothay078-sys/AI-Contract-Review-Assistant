@@ -2,12 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Shield, BarChart3, Clock, AlertTriangle } from 'lucide-react';
 
-export default function Hero({ onScrollToUpload, onGetStarted }) {
+export default function Hero({ onScrollToUpload, onGetStarted, onLoadDemo }) {
   const handleStart = () => {
     if (typeof onScrollToUpload === 'function') {
       onScrollToUpload();
     } else if (typeof onGetStarted === 'function') {
       onGetStarted();
+    }
+  };
+
+  const handleDemo = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (typeof onLoadDemo === 'function') {
+      onLoadDemo();
     }
   };
 
@@ -63,13 +70,14 @@ export default function Hero({ onScrollToUpload, onGetStarted }) {
             <Shield className="w-4 h-4" />
           </button>
           
-          <a
-            href="#dashboard-view"
-            className="px-8 py-4 bg-card hover:bg-elevated text-textSecondary font-semibold rounded-premium border border-border shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-base"
+          <button
+            type="button"
+            onClick={handleDemo}
+            className="px-8 py-4 bg-card hover:bg-elevated text-textSecondary hover:text-textPrimary font-semibold rounded-premium border border-border shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-base cursor-pointer"
           >
             <span>View Dashboard Demo</span>
-            <BarChart3 className="w-4 h-4 text-textMuted" />
-          </a>
+            <BarChart3 className="w-4 h-4 text-accent" />
+          </button>
         </motion.div>
 
         {/* Quick Highlights / Stats */}

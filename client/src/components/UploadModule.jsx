@@ -6,8 +6,9 @@ export default function UploadModule({
   onAnalysisComplete, 
   onAnalysisStart, 
   onShowNotification, 
+  onLoadDemo,
   existingContractId = null, 
-  existingContractTitle = null,
+  existingContractTitle = null, 
   existingContract = null
 }) {
   const [file, setFile] = useState(null);
@@ -188,16 +189,31 @@ export default function UploadModule({
               <p className="text-xs sm:text-sm text-textMuted mt-2 max-w-sm">
                 Supports any legal PDF document — NDA, employment, rental, service agreement, and more
               </p>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleBrowseClick();
-                }}
-                className="mt-6 px-5 py-2.5 bg-card hover:bg-border text-textSecondary font-semibold rounded-xl text-sm transition-all duration-200 shadow-sm border border-border active:scale-95"
-              >
-                Browse Files
-              </button>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleBrowseClick();
+                  }}
+                  className="px-5 py-2.5 bg-card hover:bg-border text-textSecondary hover:text-textPrimary font-semibold rounded-xl text-sm transition-all duration-200 shadow-sm border border-border active:scale-95 cursor-pointer"
+                >
+                  Browse Files
+                </button>
+                {typeof onLoadDemo === 'function' && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onLoadDemo();
+                    }}
+                    className="px-5 py-2.5 bg-accent/10 hover:bg-accent/20 text-accent font-semibold rounded-xl text-sm transition-all duration-200 border border-accent/20 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Try Sample Demo</span>
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
 

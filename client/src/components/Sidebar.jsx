@@ -47,16 +47,24 @@ export default function Sidebar({ view, currentView, currentContract, setView, o
           <nav className="space-y-1">
             <button
               onClick={() => handleNav('dashboard')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'dashboard' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'dashboard' ? 'bg-accent/10 text-accent font-semibold' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
             >
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </button>
             <button
               onClick={handleUpload}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'upload' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'upload' ? 'bg-accent/10 text-accent font-semibold' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
             >
               <FilePlus2 className="w-4 h-4" /> New Contract
             </button>
+            {currentContract && (
+              <button
+                onClick={() => handleNav('analysis')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'analysis' ? 'bg-accent/10 text-accent font-semibold' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+              >
+                <ShieldCheck className="w-4 h-4" /> Active Review
+              </button>
+            )}
           </nav>
         </div>
 
