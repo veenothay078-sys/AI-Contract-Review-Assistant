@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Building, CalendarDays, ShieldCheck } from 'lucide-react';
+import { User, Mail, Building, CalendarDays, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Profile({ onBack }) {
@@ -22,6 +22,15 @@ export default function Profile({ onBack }) {
           <h1 className="text-2xl font-bold text-textPrimary">Your Profile</h1>
           <p className="text-sm text-textMuted mt-1">Manage your account settings and preferences.</p>
         </div>
+        {typeof onBack === 'function' && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-elevated border border-border text-textSecondary hover:text-textPrimary font-semibold rounded-lg text-sm transition-all shadow-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">

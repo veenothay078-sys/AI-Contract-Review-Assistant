@@ -1,10 +1,23 @@
 import React from 'react';
 import { LayoutDashboard, FilePlus2, ShieldCheck, FileText, CalendarDays, CheckSquare, MessageSquare, Briefcase, Settings, User } from 'lucide-react';
 
-export default function Sidebar({ view, currentContract, setView, onUploadNew }) {
+export default function Sidebar({ view, currentView, currentContract, setView, onNavigate, onUploadNew }) {
+  const activeView = view || currentView || 'dashboard';
 
   const handleNav = (targetView) => {
-    setView(targetView);
+    if (typeof setView === 'function') {
+      setView(targetView);
+    } else if (typeof onNavigate === 'function') {
+      onNavigate(targetView);
+    }
+  };
+
+  const handleUpload = () => {
+    if (typeof onUploadNew === 'function') {
+      onUploadNew();
+    } else {
+      handleNav('upload');
+    }
   };
 
   const scrollTo = (id) => {
@@ -34,13 +47,13 @@ export default function Sidebar({ view, currentContract, setView, onUploadNew })
           <nav className="space-y-1">
             <button
               onClick={() => handleNav('dashboard')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${view === 'dashboard' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'dashboard' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
             >
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </button>
             <button
-              onClick={onUploadNew}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${view === 'upload' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+              onClick={handleUpload}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'upload' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
             >
               <FilePlus2 className="w-4 h-4" /> New Contract
             </button>
@@ -48,7 +61,7 @@ export default function Sidebar({ view, currentContract, setView, onUploadNew })
         </div>
 
         {/* Current Contract Analysis */}
-        {currentContract && view === 'analysis' && (
+        {currentContract && activeView === 'analysis' && (
           <div>
             <h3 className="px-3 text-xs font-semibold text-textMuted uppercase tracking-wider mb-2 line-clamp-1" title={currentContract.title}>
               {currentContract.title}
@@ -85,8 +98,8 @@ export default function Sidebar({ view, currentContract, setView, onUploadNew })
       {/* Footer / Settings */}
       <div className="p-4 border-t border-border">
         <button 
-          onClick={() => setView('profile')}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${view === 'profile' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
+          onClick={() => handleNav('profile')}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeView === 'profile' ? 'bg-accent/10 text-accent' : 'text-textSecondary hover:bg-card hover:text-textPrimary'}`}
         >
           <User className="w-4 h-4" /> Profile
         </button>

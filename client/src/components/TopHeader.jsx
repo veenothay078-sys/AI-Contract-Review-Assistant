@@ -2,15 +2,24 @@ import React from 'react';
 import { Search, Bell, Download, FileText, ChevronRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function TopHeader({ view, setView, currentContract }) {
+export default function TopHeader({ view, currentView, setView, onNavigate, currentContract }) {
   const { user } = useAuth();
+  const activeView = view || currentView || 'dashboard';
+
+  const navigate = (targetView) => {
+    if (typeof setView === 'function') {
+      setView(targetView);
+    } else if (typeof onNavigate === 'function') {
+      onNavigate(targetView);
+    }
+  };
   
   const getBreadcrumbs = () => {
-    if (view === 'dashboard') return 'Workspace / Dashboard';
-    if (view === 'upload') return 'Workspace / New Contract Upload';
-    if (view === 'comparison') return 'Workspace / Contract Comparison';
-    if (view === 'report') return `Workspace / ${currentContract?.title || 'Contract'} / Executive Report`;
-    if (view === 'analysis' && currentContract) return `Workspace / ${currentContract.title} / Version ${currentContract.versionNumber || '1'}`;
+    if (activeView === 'dashboard') return 'Workspace / Dashboard';
+    if (activeView === 'upload') return 'Workspace / New Contract Upload';
+    if (activeView === 'comparison') return 'Workspace / Contract Comparison';
+    if (activeView === 'report') return `Workspace / ${currentContract?.title || 'Contract'} / Executive Report`;
+    if (activeView === 'analysis' && currentContract) return `Workspace / ${currentContract.title} / Version ${currentContract.versionNumber || '1'}`;
     return 'Workspace';
   };
 
@@ -52,9 +61,9 @@ export default function TopHeader({ view, setView, currentContract }) {
         </button>
 
         {/* Global Action for Analysis View */}
-        {view === 'analysis' && currentContract && (
+        {activeView === 'analysis' && currentContract && (
           <button 
-            onClick={() => setView('report')} 
+            onClick={() => navigate('report')} 
             className="ml-2 flex items-center gap-2 px-4 py-2 bg-card border border-border text-textSecondary hover:bg-elevated hover:text-textPrimary font-semibold rounded-lg text-sm transition-all shadow-sm"
           >
             <FileText className="w-4 h-4" /> 
@@ -64,7 +73,7 @@ export default function TopHeader({ view, setView, currentContract }) {
 
         {/* User Profile Snippet */}
         {user && (
-          <div className="ml-4 pl-4 border-l border-border flex items-center gap-3 cursor-pointer" onClick={() => setView('profile')}>
+          <div className="ml-4 pl-4 border-l border-border flex items-center gap-3 cursor-pointer" onClick={() => navigate('profile')}>
             <div className="flex flex-col items-end">
               <span className="text-sm font-semibold text-textPrimary leading-none">{user.name}</span>
               <span className="text-xs text-textMuted mt-1">{user.company || 'Personal'}</span>

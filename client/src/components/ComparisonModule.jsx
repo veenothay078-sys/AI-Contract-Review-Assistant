@@ -5,7 +5,14 @@ import { useAuth } from '../contexts/AuthContext';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-export default function ComparisonModule({ contracts, initialVersionA, initialVersionB, onShowNotification, onViewClauseDetails, onBack }) {
+export default function ComparisonModule({ 
+  contracts = [], 
+  initialVersionA, 
+  initialVersionB, 
+  onShowNotification = () => {}, 
+  onViewClauseDetails = () => {}, 
+  onBack = () => {} 
+}) {
   const { token } = useAuth();
   const [versionAId, setVersionAId] = useState(initialVersionA || '');
   const [versionBId, setVersionBId] = useState(initialVersionB || '');

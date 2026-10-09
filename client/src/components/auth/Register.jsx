@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Mail, Lock, User, Building, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function Register({ onNavigate }) {
+export default function Register({ onNavigate, onSwitchToLogin }) {
   const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -11,6 +11,14 @@ export default function Register({ onNavigate }) {
   const [company, setCompany] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const handleSwitchToLogin = () => {
+    if (typeof onNavigate === 'function') {
+      onNavigate('login');
+    } else if (typeof onSwitchToLogin === 'function') {
+      onSwitchToLogin();
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,7 +157,7 @@ export default function Register({ onNavigate }) {
             <p className="text-sm text-textSecondary">
               Already have an account?{' '}
               <button 
-                onClick={() => onNavigate('login')}
+                onClick={handleSwitchToLogin}
                 className="font-bold text-accent hover:text-accentSecondary transition-colors"
               >
                 Log in

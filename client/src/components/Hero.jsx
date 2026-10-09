@@ -2,7 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Shield, BarChart3, Clock, AlertTriangle } from 'lucide-react';
 
-export default function Hero({ onScrollToUpload }) {
+export default function Hero({ onScrollToUpload, onGetStarted }) {
+  const handleStart = () => {
+    if (typeof onScrollToUpload === 'function') {
+      onScrollToUpload();
+    } else if (typeof onGetStarted === 'function') {
+      onGetStarted();
+    }
+  };
+
   return (
     <div className="relative overflow-hidden py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-secondaryBg via-background to-transparent">
       {/* Decorative background grid */}
@@ -48,7 +56,7 @@ export default function Hero({ onScrollToUpload }) {
           className="mt-10 flex flex-wrap justify-center gap-4"
         >
           <button
-            onClick={onScrollToUpload}
+            onClick={handleStart}
             className="px-8 py-4 bg-accent text-secondaryBg font-semibold rounded-premium shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:bg-accentSecondary hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-base"
           >
             <span>Analyze a Contract</span>

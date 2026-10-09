@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Download, ArrowLeft, ShieldCheck, AlertTriangle, FileText } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
-export default function ExecutiveReport({ contract, onBack }) {
+export default function ExecutiveReport({ contract, onBack = () => {}, onShowNotification = () => {} }) {
   const reportRef = useRef(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [message, setMessage] = useState('');

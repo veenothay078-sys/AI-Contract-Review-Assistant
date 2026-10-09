@@ -2,7 +2,14 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, CheckCircle2, Trash2, Sparkles, FileType, RefreshCw } from 'lucide-react';
 
-export default function UploadModule({ onAnalysisComplete, onShowNotification, existingContractId = null, existingContractTitle = null }) {
+export default function UploadModule({ 
+  onAnalysisComplete, 
+  onAnalysisStart, 
+  onShowNotification, 
+  existingContractId = null, 
+  existingContractTitle = null,
+  existingContract = null
+}) {
   const [file, setFile] = useState(null);
   const [rawFile, setRawFile] = useState(null); // the actual File object
   const [dragActive, setDragActive] = useState(false);
@@ -10,6 +17,15 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
   const [uploadStatus, setUploadStatus] = useState("Preparing file...");
+
+  const notify = (msg, type = 'success') => {
+    if (typeof onShowNotification === 'function') {
+      onShowNotification(msg, type);
+    }
+  };
+
+  const currentContractId = existingContractId || existingContract?.id || null;
+  const currentContractTitle = existingContractTitle || existingContract?.title || null;
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -27,11 +43,11 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
 
     const fileExt = selectedFile.name.split('.').pop().toLowerCase();
     if (fileExt !== 'pdf') {
-      onShowNotification("Invalid file type. Only PDF documents are supported.", "error");
+      notify("Invalid file type. Only PDF documents are supported.", "error");
       return;
     }
-    if (selectedFile.size > 15 * 1024 * 1024) {
-      onShowNotification("File exceeds 15MB limit. Please upload a smaller document.", "error");
+    if (selectedFile.size > 25 * 1024 * 1024) {
+      notify("File exceeds 25MB limit. Please upload a smaller document.", "error");
       return;
     }
 
@@ -65,9 +81,9 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
           type: fileExt.toUpperCase(),
           uploadTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         });
-        onShowNotification("File uploaded successfully! Ready for AI analysis.");
+        notify("File uploaded successfully! Ready for AI analysis.", "success");
       }
-    }, 150);
+    }, 120);
   };
 
   const handleDrop = (e) => {
@@ -86,7 +102,9 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
   };
 
   const handleBrowseClick = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const handleRemoveFile = () => {
@@ -94,13 +112,15 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
     setRawFile(null);
     setUploadProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    onShowNotification("File removed.");
+    notify("File removed.", "info");
   };
 
   const triggerAnalysis = () => {
     if (!file || !rawFile) return;
-    // Pass the real File object and existingContractId to App for backend analysis
-    onAnalysisComplete(rawFile, existingContractId);
+    const analyzeFn = onAnalysisComplete || onAnalysisStart;
+    if (typeof analyzeFn === 'function') {
+      analyzeFn(rawFile, currentContractId);
+    }
   };
 
   return (
@@ -170,6 +190,10 @@ export default function UploadModule({ onAnalysisComplete, onShowNotification, e
               </p>
               <button
                 type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleBrowseClick();
+                }}
                 className="mt-6 px-5 py-2.5 bg-card hover:bg-border text-textSecondary font-semibold rounded-xl text-sm transition-all duration-200 shadow-sm border border-border active:scale-95"
               >
                 Browse Files

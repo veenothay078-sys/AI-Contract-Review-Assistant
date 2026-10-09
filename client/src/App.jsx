@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Hero from './components/Hero';
 import UploadModule from './components/UploadModule';
@@ -64,6 +64,11 @@ export default function App() {
     setToastType(type);
   };
 
+  const navigateTo = (newView) => {
+    setAnalysisError(null);
+    setView(newView);
+  };
+
   const fetchContracts = async () => {
     if (!token) return;
     try {
@@ -116,6 +121,8 @@ export default function App() {
     setView('analysis');
 
     const stageTimer = startPipelineAnimation();
+    const fileName = uploadedFile?.name || 'Contract_Document.pdf';
+    const fileSize = uploadedFile?.size || '245 KB';
 
     try {
       let json = null;
@@ -145,7 +152,7 @@ export default function App() {
 
       // 2. Fallback to client-side smart contract analyzer if backend is unreachable or returned error
       if (!json || !json.documentType || !json.clauses) {
-        json = generateClientAnalysis(uploadedFile.name, uploadedFile.size);
+        json = generateClientAnalysis(fileName, fileSize);
       }
 
       clearInterval(stageTimer);
@@ -159,7 +166,7 @@ export default function App() {
       showToast("Contract analysis report generated successfully!");
     } catch (err) {
       clearInterval(stageTimer);
-      const fallbackResult = generateClientAnalysis(uploadedFile.name, uploadedFile.size);
+      const fallbackResult = generateClientAnalysis(fileName, fileSize);
       setCurrentContract(fallbackResult);
       setIsAnalyzing(false);
       showToast("Contract analysis report generated successfully!");
@@ -199,7 +206,7 @@ export default function App() {
 
   const handleScrollToUpload = () => {
     setExistingContractForUpload({ id: null, title: null });
-    setView('upload');
+    navigateTo('upload');
   };
 
   const openClauseDetails = (clause) => {
@@ -222,25 +229,35 @@ export default function App() {
 
   if (!user) {
     if (view === 'register') {
-      return <Register onSwitchToLogin={() => setView('login')} />;
+      return <Register onNavigate={navigateTo} onSwitchToLogin={() => navigateTo('login')} />;
     }
-    return <Login onSwitchToRegister={() => setView('register')} />;
+    return <Login onNavigate={navigateTo} onSwitchToRegister={() => navigateTo('register')} />;
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row font-sans text-textPrimary">
       {/* Sidebar Navigation */}
       <Sidebar 
-        currentView={view} 
-        onNavigate={(v) => {
-          setAnalysisError(null);
-          setView(v);
-        }} 
+        view={view}
+        currentView={view}
+        currentContract={currentContract}
+        setView={navigateTo}
+        onNavigate={navigateTo}
+        onUploadNew={() => {
+          setExistingContractForUpload({ id: null, title: null });
+          navigateTo('upload');
+        }}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <TopHeader onNavigate={setView} />
+        <TopHeader 
+          view={view}
+          currentView={view}
+          setView={navigateTo}
+          onNavigate={navigateTo}
+          currentContract={currentContract}
+        />
 
         <main className="flex-1 overflow-y-auto px-4 md:px-8 py-6 max-w-7xl w-full mx-auto">
           <AnimatePresence mode="wait">
@@ -249,14 +266,19 @@ export default function App() {
             {view === 'dashboard' && (
               <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <Hero 
+                  onScrollToUpload={handleScrollToUpload}
                   onGetStarted={handleScrollToUpload} 
                   totalContracts={contracts.length}
                 />
                 
                 <div className="mt-8">
                   <UploadModule 
+                    onAnalysisComplete={handleAnalysisStart}
                     onAnalysisStart={handleAnalysisStart} 
+                    onShowNotification={showToast}
                     isAnalyzing={isAnalyzing} 
+                    existingContractId={existingContractForUpload.id}
+                    existingContractTitle={existingContractForUpload.title}
                     existingContract={existingContractForUpload}
                   />
                 </div>
@@ -267,7 +289,7 @@ export default function App() {
                     onOpenContract={handleOpenContract} 
                     onUploadNewVersion={handleUploadNewVersion}
                     onViewHistory={handleViewHistory}
-                    onOpenComparison={() => setView('comparison')}
+                    onOpenComparison={() => navigateTo('comparison')}
                   />
                 )}
               </motion.div>
@@ -286,8 +308,12 @@ export default function App() {
                     </p>
                   </div>
                   <UploadModule 
+                    onAnalysisComplete={handleAnalysisStart}
                     onAnalysisStart={handleAnalysisStart} 
+                    onShowNotification={showToast}
                     isAnalyzing={isAnalyzing}
+                    existingContractId={existingContractForUpload.id}
+                    existingContractTitle={existingContractForUpload.title}
                     existingContract={existingContractForUpload}
                   />
                 </div>
@@ -302,6 +328,8 @@ export default function App() {
                   initialVersionA={comparisonVersions.a}
                   initialVersionB={comparisonVersions.b}
                   onShowNotification={showToast}
+                  onViewClauseDetails={openClauseDetails}
+                  onBack={() => navigateTo('dashboard')}
                 />
               </motion.div>
             )}
@@ -309,19 +337,23 @@ export default function App() {
             {/* 📊 EXECUTIVE REPORT 📊 */}
             {view === 'report' && (
               <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <ExecutiveReport contract={currentContract} onShowNotification={showToast} />
+                <ExecutiveReport 
+                  contract={currentContract} 
+                  onShowNotification={showToast}
+                  onBack={() => navigateTo('analysis')}
+                />
               </motion.div>
             )}
 
             {/* 👤 PROFILE 👤 */}
             {view === 'profile' && (
               <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <Profile />
+                <Profile onBack={() => navigateTo('dashboard')} />
               </motion.div>
             )}
 
             {/* 🔍 ANALYSIS 🔍 */}
-            {(view === 'analysis' || isAnalyzing || analysisError) && (
+            {(view === 'analysis' || isAnalyzing) && (
               <motion.div id="analysis-container" className="max-w-6xl mx-auto" key="analysis" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 
                 <AnimatePresence mode="wait">
@@ -386,7 +418,7 @@ export default function App() {
                         <h3 className="text-xl font-semibold text-textPrimary mb-2">Analysis Failed</h3>
                         <p className="text-sm text-textSecondary max-w-md leading-relaxed">{analysisError.message}</p>
                         <button
-                          onClick={() => { setAnalysisError(null); setView('upload'); }}
+                          onClick={() => navigateTo('upload')}
                           className="mt-8 px-5 py-2.5 bg-background hover:bg-elevated text-textPrimary font-semibold border border-border rounded-lg text-sm transition-all flex items-center gap-2"
                         >
                           <span>Try Again</span>
