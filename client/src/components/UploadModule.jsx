@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle2, Trash2, Sparkles, FileType, RefreshCw } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, Trash2, Sparkles, FileType, RefreshCw, Download } from 'lucide-react';
 
 export default function UploadModule({ 
   onAnalysisComplete, 
@@ -213,6 +213,16 @@ export default function UploadModule({
                     <span>Try Sample Demo</span>
                   </button>
                 )}
+                <a
+                  href="/Sample_Mutual_NDA.pdf"
+                  download="Sample_Mutual_NDA.pdf"
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-4 py-2.5 bg-background hover:bg-elevated text-textMuted hover:text-textPrimary font-medium rounded-xl text-xs transition-all duration-200 border border-border flex items-center gap-1.5 cursor-pointer"
+                  title="Download a real contract PDF file to your computer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Sample PDF</span>
+                </a>
               </div>
             </motion.div>
           )}
